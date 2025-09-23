@@ -13,7 +13,6 @@ export default function HistoryPage() {
       try {
         const res = await fetch("/api/quiz/history");
         if (!res.ok) throw new Error("Failed to fetch quiz history");
-
         const data = await res.json();
         setQuizzes(data);
       } catch (err) {
@@ -23,7 +22,6 @@ export default function HistoryPage() {
         setLoading(false);
       }
     };
-
     fetchHistory();
   }, []);
 
@@ -32,21 +30,20 @@ export default function HistoryPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Quiz History</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Quiz History</h1>
 
       <div className="space-y-4">
         {quizzes.map((quiz) => (
           <div
             key={quiz._id}
-            className="border p-4 rounded shadow hover:shadow-lg cursor-pointer"
+            className="border p-5 rounded shadow hover:shadow-lg cursor-pointer"
             onClick={() => router.push(`/dashboard/history/${quiz._id}`)}
           >
-            <p className="font-semibold mb-1">{quiz.name}</p>
-
-            <p className="text-sm text-gray-600">
-              Questions: {quiz.totalQuestions} | Taken on:{" "}
-              {quiz.createdAt ? new Date(quiz.createdAt).toLocaleString() : "N/A"} | Score:{" "}
-              {quiz.score !== undefined && quiz.score !== null ? quiz.score : "Not graded yet"}
+            <p className="text-xl font-semibold mb-1">{quiz.name}</p>
+            <p className="text-lg text-gray-400">
+              Questions: {quiz.totalQuestions} | Score:{" "}
+              {quiz.score !== undefined && quiz.score !== null ? quiz.score : "Not graded yet"} | Taken on:{" "}
+              {quiz.createdAt ? new Date(quiz.createdAt).toLocaleString() : "N/A"}
             </p>
           </div>
         ))}

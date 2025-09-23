@@ -14,7 +14,6 @@ export default function QuizHistoryDetails() {
       try {
         const res = await fetch(`/api/quiz/${id}`);
         if (!res.ok) throw new Error("Failed to fetch quiz");
-
         const data = await res.json();
         setQuiz(data);
       } catch (err) {
@@ -25,64 +24,58 @@ export default function QuizHistoryDetails() {
         setLoading(false);
       }
     };
-
     fetchQuiz();
   }, [id, router]);
 
-  if (loading) return <p className="text-center mt-6">Loading...</p>;
+  if (loading) return <p className="text-center mt-6">Loading quiz...</p>;
   if (!quiz) return <p className="text-center mt-6">Quiz not found</p>;
 
   const totalQuestions = quiz.questions?.length || 0;
-  const correctAnswers = quiz.questions?.filter(
-    (q) => q.userAnswer === q.correctAnswer
-  )?.length || 0;
-  const score = quiz.score ?? correctAnswers;
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-6 p-4 bg-gray-100 rounded shadow">
-        <h2 className="text-xl font-bold mb-2">Quiz Summary</h2>
-        <p><strong>Quiz Name:</strong> {quiz.name}</p>
-        <p><strong>Number of Questions:</strong> {totalQuestions}</p>
-        <p>
-          <strong>Date Taken:</strong>{" "}
-          {quiz.createdAt ? new Date(quiz.createdAt).toLocaleString() : "N/A"}
-        </p>
-        <p><strong>Score:</strong> {score}/{totalQuestions}</p>
+      <div className="mb-6 p-4 border rounded shadow">
+        <h2 className="text-2xl font-bold text-center mb-4">Quiz Summary</h2>
+        <div className="flex items-center justify-between px-4 gap-4 flex-wrap">
+          <span><strong>Quiz:</strong> {quiz.name}</span>
+          <span className="text-gray-300">|</span>
+          <span><strong>Questions:</strong> {totalQuestions}</span>
+          <span className="text-gray-300">|</span>
+          <span><strong>Score:</strong> {quiz.score}/{totalQuestions}</span>
+          <span className="text-gray-300">|</span>
+          <span><strong>Taken on:</strong> {quiz.createdAt ? new Date(quiz.createdAt).toLocaleString() : "N/A"}</span>
+        </div>
       </div>
 
       <div>
-        <h2 className="text-xl font-bold mb-4">Questions</h2>
-        {totalQuestions === 0 ? (
-          <p>No questions available.</p>
-        ) : (
-          quiz.questions.map((q, idx) => (
-            <div key={idx} className="mb-4 p-4 border rounded shadow-sm">
-              <p className="font-semibold mb-2">
-                {idx + 1}. {q.question || "Question not found"}
-              </p>
-              <ul className="list-disc pl-5">
-                {q.options?.map((opt, i) => {
-                  let bgColor = "";
-                  if (opt === q.correctAnswer) bgColor = "bg-green-200";
-                  if (opt === q.userAnswer && q.userAnswer !== q.correctAnswer)
-                    bgColor = "bg-red-200";
-
-                  return (
-                    <li key={i} className={`p-1 rounded mb-1 ${bgColor}`}>
-                      {opt}
-                      {opt === q.correctAnswer && <span className="ml-2 font-bold">(Correct)</span>}
-                      {opt === q.userAnswer && q.userAnswer !== q.correctAnswer && (
-                        <span className="ml-2 font-bold">(Your Answer)</span>
-                      )}
-                    </li>
-                  );
-                })}
-                {!q.userAnswer && <li className="text-gray-500">Not answered</li>}
-              </ul>
-            </div>
-          ))
-        )}
+        <h2 className="text-2xl font-bold text-center mb-4">Questions & Answers</h2>
+        {quiz.questions.map((q, idx) => (
+          <div key={idx} className="mb-4 p-4 border rounded shadow-sm">
+            <p className="font-semibold mb-2">{idx + 1}. {q.question}</p>
+            <ul className="space-y-2">
+              {q.options.map((opt, i) => {
+                const letter = String.fromCharCode(65 + i);
+                const isCorrect = letter === q.correctAnswer;
+                const isUser = letter === q.userAnswer;
+                return (
+                  <li
+                    key={i}
+                    className={`p-2 rounded mb-2 ${isCorrect
+                      ? "border-2 border-green-500 ring-2 ring-green-200 text-green-100"
+                      : isUser && !isCorrect
+                        ? "border-2 border-red-500 ring-2 ring-red-200 text-red-100"
+                        : ""
+                      }`}
+                  >
+                    <span className="mr-2 font-bold">{letter}.</span>
+                    {opt}
+                  </li>
+                );
+              })}
+              {!q.userAnswer && <li className="text-red-500 italic">Not answered</li>}
+            </ul>
+          </div>
+        ))}
       </div>
     </div>
   );

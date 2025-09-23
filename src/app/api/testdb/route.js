@@ -1,6 +1,6 @@
-import {connectDB} from "@/lib/mongodb";
+import { connectDB } from "@/lib/mongodb";
 
-export const GET=async()=>{
+export const GET = async () => {
     await connectDB();
     return new Response("DB connection attempted");
 };

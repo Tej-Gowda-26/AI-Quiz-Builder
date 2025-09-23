@@ -3,25 +3,22 @@ import Quiz from "@/models/quiz";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-export const GET = async (req, { params }) => {
+export const GET = async (req, context) => {
   try {
     await connectDB();
 
     const session = await getServerSession(authOptions);
-    if (!session) return new Response("Unauthorized", { status: 401 });
+    if (!session) return new Response(JSON.stringify({ message: "Unauthorized" }), { status: 401 });
 
-    const { id } = params;
-    if (!id) return new Response("Quiz id is required", { status: 404 });
+    const { id } = await context.params;
+    if (!id) return new Response(JSON.stringify({ message: "Quiz ID required" }), { status: 404 });
 
     const quiz = await Quiz.findById(id).lean();
-    if (!quiz) return new Response("Quiz not found", { status: 404 });
-
-    if (quiz.user.toString() !== session.user.id)
-      return new Response("Forbidden", { status: 403 });
+    if (!quiz) return new Response(JSON.stringify({ message: "Quiz not found" }), { status: 404 });
 
     return new Response(JSON.stringify(quiz), { status: 200 });
   } catch (err) {
-    console.error("Quiz fetch error:", err);
-    return new Response("Failed to fetch quiz", { status: 500 });
+    console.error("Fetch quiz error:", err);
+    return new Response(JSON.stringify({ message: "Failed to fetch quiz" }), { status: 500 });
   }
 };

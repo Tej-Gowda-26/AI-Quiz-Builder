@@ -9,22 +9,17 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const parseGeminiOutput = (text) => {
   try {
     const parsed = JSON.parse(text);
-    if (Array.isArray(parsed)) return parsed.map(q => ({ ...q, userAnswer: "" }));
+    if (Array.isArray(parsed)) return parsed;
   } catch {
     const questions = [];
     const regex = /(\d+)\.\s*(.*?)\s*A\.(.*?)B\.(.*?)C\.(.*?)D\.(.*?)Correct:?\s*([A-D])/gms;
     let match;
+
     while ((match = regex.exec(text)) !== null) {
       questions.push({
         question: match[2].trim(),
-        options: [
-          match[3].trim(),
-          match[4].trim(),
-          match[5].trim(),
-          match[6].trim(),
-        ],
+        options: [match[3].trim(), match[4].trim(), match[5].trim(), match[6].trim()],
         correctAnswer: match[7].trim(),
-        userAnswer: "",
       });
     }
     return questions;
@@ -35,8 +30,7 @@ const parseGeminiOutput = (text) => {
 const generateQuiz = async (text, numQuestions) => {
   const prompt = `
     Generate ${numQuestions} multiple-choice questions from the following text.
-    Each question has 4 options labeled A-D.
-    Indicate the correct answer.
+    Each question must have 4 options (A-D) and specify the correct answer.
     Format as JSON array or plain text like:
     1. Question text
        A. option1 B. option2 C. option3 D. option4
@@ -50,11 +44,7 @@ const generateQuiz = async (text, numQuestions) => {
   });
 
   const outputText = response.text || response.contents?.[0]?.text || "";
-  console.log(outputText);
-
-  const questions = parseGeminiOutput(outputText);
-
-  return questions;
+  return parseGeminiOutput(outputText);
 };
 
 export const POST = async (req) => {
@@ -62,26 +52,17 @@ export const POST = async (req) => {
     const { name, text, numQuestions } = await req.json();
 
     if (!text || !numQuestions) {
-      return new Response(
-        JSON.stringify({ message: "Text and number of questions are required." }),
-        { status: 400 }
-      );
+      return new Response(JSON.stringify({ message: "Text and number of questions are required." }), { status: 400 });
     }
 
     await connectDB();
 
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return new Response(JSON.stringify({ message: "Unauthorized" }), { status: 401 });
-    }
+    if (!session) return new Response(JSON.stringify({ message: "Unauthorized" }), { status: 401 });
 
     const questions = await generateQuiz(text, numQuestions);
-
     if (!questions.length) {
-      return new Response(
-        JSON.stringify({ message: "No questions could be generated from the text." }),
-        { status: 400 }
-      );
+      return new Response(JSON.stringify({ message: "No questions could be generated" }), { status: 400 });
     }
 
     const quiz = await Quiz.create({
@@ -94,9 +75,6 @@ export const POST = async (req) => {
     return new Response(JSON.stringify(quiz), { status: 201 });
   } catch (error) {
     console.error("Quiz generation error:", error);
-    return new Response(
-      JSON.stringify({ message: "Failed to generate quiz. Check server logs." }),
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ message: "Failed to generate quiz" }), { status: 500 });
   }
 };
