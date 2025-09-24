@@ -4,7 +4,8 @@
 
 ---
 
-## 🌐 Live Demo: [AI Quiz Builder](https://ai-quiz-builder-ten.vercel.app/)  
+## 🌐 Live Demo: 
+## [AI Quiz Builder](https://ai-quiz-builder-ten.vercel.app/)  
 
 ---
 
