@@ -5,7 +5,7 @@
 ---
 
 ## 🌐 Live Demo  
-    [AI Quiz Builder](https://ai-quiz-builder-ten.vercel.app/)  
+[AI Quiz Builder](https://ai-quiz-builder-ten.vercel.app/)  
 
 ---
 
@@ -28,4 +28,4 @@
 
 ---
 
-*Start building knowledge today with **AI Quiz Builder** — your smart companion for effortless learning.*  
+*Start building knowledge today with **AI Quiz Builder** - your smart companion for effortless learning.*  
