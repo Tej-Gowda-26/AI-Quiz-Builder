@@ -2,8 +2,6 @@
 
 **AI Quiz Builder** is a full-stack web application that makes it simple to **create, take, and track quizzes**, all while providing an intuitive interface and AI-powered question generation for smarter learning.  
 
----
-
 ## 🌐 Try the live demo: [AI Quiz Builder](https://ai-quiz-builder-ten.vercel.app/)  
 
 ---
